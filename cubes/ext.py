@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from textwrap import dedent
-from pkg_resources import iter_entry_points
+from importlib.metadata import entry_points
 
 from .common import decamelize, coalesce_options
 from .errors import ArgumentError, InternalError, BackendError
@@ -251,6 +251,15 @@ class ExtensionFinder(object):
         self.extensions["name"] = ext
 
         return ext
+
+
+def iter_entry_points(group, name=None):
+    """Python ≥3.10: yield EntryPoint objects for a group, optionally by name."""
+    eps = entry_points().select(group=group)
+    if name is not None:
+        eps = [ep for ep in eps if ep.name == name]
+    for ep in eps:
+        yield ep
 
 
 def _load_module(modulepath):
